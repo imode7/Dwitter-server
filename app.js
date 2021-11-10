@@ -1,52 +1,32 @@
+/**
+ * node api 설계방법
+ * express, cors, helmet, morgan library를 설치한다.
+ * router설정을 위해 tweet.js 파일을 분리한 후 경로주소를 설정한다.
+ * router는 기본주소뒤에 커스텀된 주소를 추가한다.
+ * page Not Found를 잡기위한 404에러 부분을 추가한다.
+ * 문법에러를 위한 500에러 부분을 추가한다.
+ */
+
 import express from "express";
 import cors from "cors";
+import tweetsRouter from "./router/tweet.js";
+import helmet from "helmet";
+import morgan from "morgan";
 const app = express();
 
-// initialize tweet
-let tweets = [
-  {
-    id: 1,
-    text: "First tweet in Server",
-    createdAt: new Date().toISOString(),
-    name: "Bob",
-    username: "bob",
-    url: "http://onair.sisaphone.com/image/login/avatar3.png",
-  },
-];
-
-app.use(cors());
 app.use(express.json());
+app.use(helmet());
+app.use(cors());
+app.use(morgan("tiny"));
 
-app.get("/tweets", (req, res) => {
-  res.status(200).send({ tweets });
+app.use("/tweets", tweetsRouter);
+
+app.use((req, res, next) => {
+  res.sendStatus(404);
 });
 
-app.post("/tweets", (req, res) => {
-  const params = req.body.params;
-  const param = {
-    id: params.id,
-    text: params.text,
-    createdAt: params.createdAt,
-    name: params.name,
-    username: params.username,
-  };
-  tweets.push(param);
-  res.status(201).send({ tweets });
+app.use((error, req, res, next) => {
+  console.error(error);
+  res.sendStatus(500);
 });
-
-app.delete("/tweets/:id", (req, res) => {
-  tweets = tweets.filter((tweet) => tweet.id !== Number(req.params.id));
-  res.status(201).send({ tweets });
-});
-
-app.put("/tweets/:id&:text", (req, res) => {
-  const tweet = tweets.find((tweet) => tweet.id === Number(req.params.id));
-  if (!tweet) {
-    res.status(500).send("tweet doesn't match");
-  } else {
-    tweet.text = req.params.text;
-    res.status(201).send({ tweets });
-  }
-});
-
 app.listen(8079);
