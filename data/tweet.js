@@ -51,5 +51,6 @@ export async function update(id, text) {
 
 // 트윗 삭제
 export async function remove(id) {
-  return tweets.filter((tweet) => tweet.id !== id);
+  tweets = tweets.filter((tweet) => tweet.id !== id);
+  return tweets;
 }

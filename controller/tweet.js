@@ -10,7 +10,6 @@ export async function getTweets(req, res, next) {
 
 export async function getTweet(req, res, next) {
   const id = req.params.id;
-  // const data = id ? tweets.filter((tweet) => id === tweet.id) : "";
   const data = id ? await tweetRepository.getId(id) : "";
   res.status(200).json(data);
 }
