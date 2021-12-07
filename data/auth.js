@@ -48,9 +48,13 @@ export async function signup(username, password, name, email, url) {
 
 // 로그인
 export async function login(username, password) {
-  const loginUser = authDBs.filter(
-    (param) => param.username === username && param.password === password
-  );
+  const loginUser = authDBs.filter((param) => {
+    console.log(param);
+    return (
+      param.username === username &&
+      bcrypt.compareSync(password, param.password) === true
+    );
+  });
 
   if (loginUser.length > 0) {
     const loginUserName = loginUser[0].username;
