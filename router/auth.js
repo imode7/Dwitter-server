@@ -7,17 +7,47 @@
  */
 
 import express from "express";
+import { body } from "express-validator";
 import * as authController from "../controller/auth.js";
+import { validate } from "../middleware/validate.js";
+import { isAuth } from "../middleware/auth.js";
+
+/**
+ * signup에 대한 검사
+ * login에 대한 검사
+ */
+
+const validatecredential = [
+  body(["username"])
+    .trim()
+    .notEmpty()
+    .withMessage("username should be at least 5 characters"),
+  body(["password"])
+    .trim()
+    .isLength({ min: 5 })
+    .withMessage("password should be at least 5 characters"),
+];
+
+const validateSignup = [
+  ...validatecredential,
+  body("name").notEmpty().withMessage("name is missing"),
+  body("email").isEmail().normalizeEmail().withMessage("invalid email"),
+  body("url")
+    .isURL()
+    .withMessage("invalid URL")
+    .optional({ nullable: true, checkFalsy: true }),
+  validate,
+];
 
 const router = express.Router();
 
 // POST // signup
-router.post("/signup", authController.signup);
+router.post("/signup", validateSignup, authController.signup);
 
 // POST // login
-router.post("/login", authController.login);
+router.post("/login", validatecredential, authController.login);
 
 // GET // me
-router.get("/me", authController.me);
+router.get("/me", isAuth, authController.me);
 
 export default router;
