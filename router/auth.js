@@ -18,11 +18,11 @@ import { isAuth } from "../middleware/auth.js";
  */
 
 const validatecredential = [
-  body(["username"])
+  body("username")
     .trim()
     .notEmpty()
     .withMessage("username should be at least 5 characters"),
-  body(["password"])
+  body("password")
     .trim()
     .isLength({ min: 5 })
     .withMessage("password should be at least 5 characters"),
